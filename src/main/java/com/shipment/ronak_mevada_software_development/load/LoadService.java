@@ -16,10 +16,10 @@ import java.util.List;
  */
 @Service
 public class LoadService {
-    private final LoadRepository LoadRepository;
+    private final LoadRepository loadRepository;
     private final ModelMapper modelMapper;
-    public LoadService(LoadRepository payloadRepository, ModelMapper modelMapper) {
-        this.LoadRepository = payloadRepository;
+    public LoadService(LoadRepository loadRepository, ModelMapper modelMapper) {
+        this.loadRepository = loadRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -31,18 +31,19 @@ public class LoadService {
         } catch (ParseException e) {
             throw new InvalidDateFormat();
         }
-        LoadEntity LoadEntity = modelMapper.map(request, LoadEntity.class);
-        return LoadRepository.save(LoadEntity);
+        LoadEntity loadEntity = modelMapper.map(request, LoadEntity.class);
+        loadEntity.setDate(date);
+        return loadRepository.save(loadEntity);
     }
 
     public List<LoadEntity> getLoadByShipperId(String shipperId){
-        List<LoadEntity> Loads = shipperId==null? LoadRepository.findAll() : LoadRepository.findAllByShipperId(shipperId);
-        return Loads;
+        List<LoadEntity> loads = shipperId==null? loadRepository.findAll() : loadRepository.findAllByShipperId(shipperId);
+        return loads;
     }
 
     public LoadEntity getLoadByLoadId(Long loadId){
-        LoadEntity Load = LoadRepository.findById(loadId).orElseThrow(()->new LoadIdNotFoundException(loadId));
-        return Load;
+        LoadEntity load = loadRepository.findById(loadId).orElseThrow(()->new LoadIdNotFoundException(loadId));
+        return load;
     }
 
     public LoadEntity updateLoadByLoadId(Long loadId, UpdateLoadRequest request) {
@@ -54,22 +55,22 @@ public class LoadService {
             throw new InvalidDateFormat();
         }
 
-        LoadEntity payload = getLoadByLoadId(loadId);
-        payload.setLoadingPoint(request.getLoadingPoint());
-        payload.setUnloadingPoint(request.getUnloadingPoint());
-        payload.setProductType(request.getProductType());
-        payload.setTruckType(request.getTruckType());
-        payload.setNoOfTrucks(request.getNoOfTrucks());
-        payload.setWeight(request.getWeight());
-        payload.setComment(request.getComment());
-        payload.setDate(date);
+        LoadEntity load = getLoadByLoadId(loadId);
+        load.setLoadingPoint(request.getLoadingPoint());
+        load.setUnloadingPoint(request.getUnloadingPoint());
+        load.setProductType(request.getProductType());
+        load.setTruckType(request.getTruckType());
+        load.setNoOfTrucks(request.getNoOfTrucks());
+        load.setWeight(request.getWeight());
+        load.setComment(request.getComment());
+        load.setDate(date);
 
-        return LoadRepository.save(payload);
+        return loadRepository.save(load);
     }
 
     public void deleteLoadByLoadId(Long loadId){
-        LoadEntity payload = getLoadByLoadId(loadId);
-        LoadRepository.delete(payload);
+        LoadEntity load = getLoadByLoadId(loadId);
+        loadRepository.delete(load);
     }
 
     public static class LoadIdNotFoundException extends IllegalArgumentException{
